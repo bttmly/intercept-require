@@ -34,7 +34,6 @@ describe('testing require-hook', function() {
     requireHook.getData_thirdParty();
     requireHook.getData_localThirdParty();
     requireHook.getOriginalRequire();
-    requireHook.getProfilerRequire();
     done();
   });
 
