@@ -5,6 +5,7 @@
 'use strict';
 
 var should = require('should');
+var path = require('path');
 
 describe('testing require-hook', function() {
   this.timeout(0);
@@ -29,12 +30,25 @@ describe('testing require-hook', function() {
     Module.prototype.require.should.not.equal(oldRequire);
     requireHook.detach();
     requireHook.attach();
-    requireHook.getData();
     requireHook.getData_localToProject();
     requireHook.getData_thirdParty();
     requireHook.getData_localThirdParty();
     requireHook.getOriginalRequire();
     requireHook.getProfilerRequire();
+    done();
+  });
+
+  it('testing setEvent', function(done) {
+    var requireHook = require("../");
+    requireHook.setEvent(function(requireResult, requireCallData){
+    });
+    require("./mathHelper.js");
+    var data = requireHook.getData();
+    should.equal(data.length, 2);
+    should.equal(data[0].getId(), path.join(process.cwd(), "index.js"));
+    should.equal(data[1].getId(), path.join(process.cwd(), "test", "mathHelper.js"));
+    require("./mathHelper.js", "__skip");
+    require("path");
     done();
   });
 
