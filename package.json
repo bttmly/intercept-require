@@ -1,0 +1,32 @@
+{
+  "name": "require-hook",
+  "version": "0.1.0",
+  "description": "A node.js library that allows you to hook 'require'",
+  "keywords": [
+    "require", "hook", "override", "mock"
+  ],
+  "homepage": "https://bitbucket.org/ralphv/require-hook",
+  "author": "ralph varjabedian",
+  "directories": {
+    "lib": "./lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/ralphv/require-hook.git"
+  },
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "lodash": "*"
+  },
+  "devDependencies": {
+    "should": "*",
+    "grunt": "^0.4.5",
+    "grunt-mocha-test": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-shell": "*"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "main": "index.js"
+}

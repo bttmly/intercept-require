@@ -1,0 +1,7 @@
+/.idea
+/node_modules
+/out
+/reports
+/cov-reports
+npm-debug.log
+
