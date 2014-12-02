@@ -18,8 +18,7 @@ describe('testing require-hook', function() {
     }
     var Module = require("module");
     var oldRequire = Module.prototype.require;
-    should.not.exist(global.moduleRequire);
-    Module.prototype.require.should.not.equal(oldRequire);
+    Module.prototype.require.should.equal(oldRequire);
     requireHook.config.testOnlySubPath = []; // remove it, we need the hook to attach to all files in test mode
     requireHook.config.alternateProjectPaths = ["/anything"];
     try {
@@ -27,6 +26,7 @@ describe('testing require-hook', function() {
     } catch(err) {
       should.exist(err);
     }
+    Module.prototype.require.should.not.equal(oldRequire);
     requireHook.detach();
     requireHook.attach();
     requireHook.getData();
