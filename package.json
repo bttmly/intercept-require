@@ -1,9 +1,9 @@
 {
   "name": "require-hook",
   "version": "0.1.0",
-  "description": "A node.js library that allows you to hook 'require'",
+  "description": "A node.js library that allows you to hook 'require', gather data about calls to 'require' and intercept/modify the results",
   "keywords": [
-    "require", "hook", "override", "mock"
+    "require", "hook", "override", "mock", "intercept", "modify"
   ],
   "homepage": "https://bitbucket.org/ralphv/require-hook",
   "author": "ralph varjabedian",
