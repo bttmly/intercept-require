@@ -22,9 +22,10 @@
 
 In your project:
 
+    var path = require("path");
     var require-hook = require("require-hook");
 
-    require-hook.attach();
+    require-hook.attach(path.resolve());
     ...
     var result = require-hook.getData();
 
@@ -71,9 +72,18 @@ __Properties__
 ---------------------------------------
 
 <a name="attach" />
-### attach()
+### attach(projectPath)
 
 Hook the require functionality.
+
+__Arguments__
+
+* `projectPath` - Target project's path
+
+__Example__
+
+    var path = require("path");
+    require-hook.attach(path.resolve());
 
 ---------------------------------------
 
