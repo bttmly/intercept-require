@@ -26,7 +26,7 @@ In your project:
 
     require-hook.attach();
     ...
-    require-hook.getData();
+    var result = require-hook.getData();
 
 ### What is collected
 
@@ -45,6 +45,102 @@ require-hook will gather an array of data, each element will have the following 
     }
 
 ### API
+
+* [`config`](#config)
+* [`attach`](#attach)
+* [`detach`](#detach)
+* [`setEvent`](#setEvent)
+* [`getData`](#getData)
+* [`getData_localToProject`](#getData_localToProject)
+* [`getData_thirdParty`](#getData_thirdParty)
+* [`getData_localThirdParty`](#getData_localThirdParty)
+* [`filterData`](#filterData)
+
+---------------------------------------
+
+<a name="config" />
+### config (object)
+
+This is the configuration object, the same object that gets loaded from config.js file.
+
+__Properties__
+
+* `testOnlySubPath` - An array of substrings that identify code loaded from test related sub folders.
+* `alternateProjectPaths` - Pass alternate projects path to identify as "localToProject"
+
+---------------------------------------
+
+<a name="attach" />
+### attach()
+
+Hook the require functionality.
+
+---------------------------------------
+
+<a name="detach" />
+### detach()
+
+Remove the hook.
+
+---------------------------------------
+
+<a name="setEvent" />
+### setEvent(event_handler)
+
+Set an optional event handler which will be called on each "require" call.
+
+__Arguments__
+
+* `event_handler` - A function that will receive two parameters: result, e.
+* `event_handler(result, e)` - The event handler that will be called on each "require".
+  The event handler is passed a `result`, the result of the require (what is exposed through module.exports).
+  `e` is the [information](#what-is-collected) describing the require.
+
+---------------------------------------
+
+<a name="getData" />
+### getData()
+
+Returns the collected data as an array.
+
+---------------------------------------
+
+<a name="getData_localToProject" />
+### getData_localToProject()
+
+Returns the collected data as an array, filtered with localToProject flag only.
+
+---------------------------------------
+
+<a name="getData_thirdParty" />
+### getData_thirdParty()
+
+Returns the collected data as an array, filtered with thirdParty (non-native) flag only.
+
+---------------------------------------
+
+<a name="getData_localThirdParty" />
+### getData_localThirdParty()
+
+Returns the collected data as an array, filtered with localToProject and thirdParty flags only.
+This is useful when used with the config option alternateProjectPaths
+
+---------------------------------------
+
+<a name="filterData" />
+### filterData(filter)
+
+Returns the collected data as an array, filtered with the given filter set.
+
+__Arguments__
+
+* `filter` - An object with flags to filter
+
+__Example__
+
+    var result = require-hook.filterData({native: false, localToProject: true, thirdParty: true});
+
+    var result = require-hook.filterData({native: false, thirdParty: true});
 
 ### License
 
