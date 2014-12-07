@@ -154,10 +154,11 @@ __Example__
 
 ### License
 
-require-hook is licensed under the [BSD-3 License](http://bitbucket.com/ralphv/require-hook/raw/master/LICENSE).
+require-hook is licensed under the MIT License
 
 ### Changelog
 
+* 0.1.1: License change to MIT
 * 0.1.0: Initial version
 
 ### Third-party libraries
