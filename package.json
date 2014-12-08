@@ -1,6 +1,6 @@
 {
   "name": "require-hook",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A node.js library that allows you to hook 'require', gather data about calls to 'require' and intercept/modify the results",
   "keywords": [
     "require", "hook", "override", "mock", "intercept", "modify"

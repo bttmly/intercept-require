@@ -158,7 +158,10 @@ require-hook is licensed under the MIT License
 
 ### Changelog
 
+* 0.1.2: minor changes
+
 * 0.1.1: License change to MIT
+
 * 0.1.0: Initial version
 
 ### Third-party libraries
