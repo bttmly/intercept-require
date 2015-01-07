@@ -3,7 +3,16 @@
 
 # intercept-require [![Build Status](https://travis-ci.org/nickb1080/intercept-require.svg?branch=master)](https://travis-ci.org/nickb1080/intercept-require)
 
-Docs coming shortly.
+```js
+var intercept = require("intercept-require");
+intercept.attach();
+
+// calls to require() are now being intercepted
+
+
+
+
+```
 
 ### License
 MIT

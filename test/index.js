@@ -53,16 +53,25 @@ function validateObj (target, validator) {
 describe('replacing Module.prototype.require()', function() {
 
   it('attaches and detaches as expected', function() {
-    var requireHook = require("../");
+    var intercept = require("../");
 
     var Module = require("module");
     var oldRequire = Module.prototype.require;
 
     Module.prototype.require.should.equal(oldRequire);
-    requireHook.attach();
+    intercept.attach();
     Module.prototype.require.should.not.equal(oldRequire);
-    requireHook.detach();
+    intercept.detach();
     Module.prototype.require.should.equal(oldRequire);
+  });
+
+  it("doesn't fail if intercepting is active but no listener", function () {
+    var intercept = require("..");
+    intercept.attach();
+    (function () {
+      require("path").should.be(ok);
+    }).should.not.throw();
+    intercept.detach();
   });
 
 });
@@ -73,17 +82,17 @@ function checkCalculator (calc) {
 }
 
 describe('intercepting require()', function () {
-  var requireHook = require("..");
+  var intercept = require("..");
 
-  beforeEach(butt(requireHook.attach, 0));
-  afterEach(butt(requireHook.detach, 0));
+  beforeEach(butt(intercept.attach, 0));
+  afterEach(butt(intercept.detach, 0));
 
   it('invokes the listener when `require()` is invoked', function () {
     var called = false;
     function listener () {
       called = true;
     }
-    requireHook.setListener(listener);
+    intercept.setListener(listener);
     var calc = require("./calculator.js");
     (checkCalculator(calc)).should.equal(true);
     called.should.equal(true);
@@ -95,7 +104,7 @@ describe('intercepting require()', function () {
       result = r;
       info = i;
     }
-    requireHook.setListener(listener);
+    intercept.setListener(listener);
     calc = require("./calculator");
     calc.should.equal(result);
     (checkCalculator(calc)).should.equal(true);
@@ -120,7 +129,7 @@ describe('intercepting require()', function () {
     function listener () {
       return true;
     }
-    requireHook.setListener(listener);
+    intercept.setListener(listener);
     var calculator = require("./calculator.js");
     calculator.should.equal(true);
   });
@@ -133,10 +142,10 @@ describe('intercepting require()', function () {
       /unexpected identifier/i.test(err.message).should.equal(true);
       return true;
     }
-    requireHook.setListener(listener1);
+    intercept.setListener(listener1);
     require("./malformed.js");
 
-    requireHook.resetListener();
+    intercept.resetListener();
 
     function listener2 (err, info) {
       (err instanceof Error).should.equal(true);
@@ -144,13 +153,13 @@ describe('intercepting require()', function () {
       /cannot find module/i.test(err.message).should.equal(true);
       return true;
     }
-    requireHook.setListener(listener2);
+    intercept.setListener(listener2);
     require("./no-exist.js");
 
   });
 
   it('throws the error if one is passed back from the listener', function () {
-    requireHook.setListener(noop);
+    intercept.setListener(noop);
     (function () {
       require("./no-exist.js");
     }).should.throw(/cannot find module/i);
