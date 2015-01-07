@@ -3,7 +3,12 @@
   "version": "0.1.2",
   "description": "A node.js library that allows you to hook 'require', gather data about calls to 'require' and intercept/modify the results",
   "keywords": [
-    "require", "hook", "override", "mock", "intercept", "modify"
+    "require",
+    "hook",
+    "override",
+    "mock",
+    "intercept",
+    "modify"
   ],
   "homepage": "https://bitbucket.org/ralphv/require-hook",
   "author": "ralph varjabedian",
@@ -16,17 +21,23 @@
   },
   "license": "MIT",
   "dependencies": {
-    "lodash": "*"
+    "lodash.find": "^2.4.1",
+    "lodash.intersection": "^2.4.1",
+    "object-assign": "^2.0.0"
   },
   "devDependencies": {
-    "should": "*",
+    "chai": "^1.10.0",
     "grunt": "^0.4.5",
-    "grunt-mocha-test": "*",
     "grunt-contrib-clean": "*",
-    "grunt-shell": "*"
+    "grunt-mocha-test": "*",
+    "grunt-shell": "*",
+    "jshint": "^2.5.11",
+    "mocha": "^2.1.0",
+    "should": "*"
   },
   "scripts": {
-    "test": "grunt test"
+    "lint": "jshint",
+    "test": "mocha"
   },
   "main": "index.js"
 }
