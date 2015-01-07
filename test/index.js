@@ -14,6 +14,27 @@ function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
 
+function validateObj (target, validator) {
+  Object.keys(validator).forEach(function (key) {
+    if (!target.hasOwnProperty(key)) {
+      throw new Error("Target object doesn't have key " + key);
+    }
+
+    if (validator[key] instanceof RegExp) {
+      if (!validator[key].test(target[key])) {
+        throw new Error("Target object's " + key + "property didn't match RegExp");
+      }
+      return;
+    }
+
+    if (validator[key] !== target[key]) {
+      throw new Error("Expected properties at key " + key + "to be equal");
+    }
+
+
+  });
+}
+
 describe('replacing Module.prototype.require()', function() {
 
   it('attaches and detaches as expected', function() {
@@ -67,14 +88,16 @@ describe('intercepting require()', function () {
     var callingFileRe = new RegExp(escapeRegExp("intercept-require/test/index.js") + "$");
     var absPathRe = new RegExp(escapeRegExp("intercept-require/test/calculator.js") + "$");
 
-    info.callingFile.match(callingFileRe).should.be.ok();
-    info.moduleId.should.equal("./calculator.js");
-    info.extname.should.equal(".js");
-    info.native.should.equal(false);
-    info.thirdParty.should.equal(false);
-    info.absPath.match(absPathRe).should.be.ok();
-    info.absPathResolvedCorrectly.should.equal(true);
-    info.localToProject.should.equal(true);
+    validateObj(info, {
+      callingFile: callingFileRe,
+      moduleId: "./calculator.js",
+      extname: ".js",
+      native: false,
+      thirdParty: false,
+      absPath: absPathRe,
+      absPathResolvedCorrectly: true,
+      localToProject: true
+    });
   });
 
   it('allows the listener to pass back a value', function () {
@@ -87,12 +110,17 @@ describe('intercepting require()', function () {
   });
 
   it('passes an error in the result spot if one occurs', function () {
+
     function listener1 (err, info) {
       (err instanceof Error).should.equal(true);
       should.exist(info);
       /unexpected identifier/i.test(err.message).should.equal(true);
       return true;
     }
+    requireHook.setListener(listener1);
+    require("./malformed.js");
+
+    requireHook.resetListener();
 
     function listener2 (err, info) {
       (err instanceof Error).should.equal(true);
@@ -100,18 +128,14 @@ describe('intercepting require()', function () {
       /cannot find module/i.test(err.message).should.equal(true);
       return true;
     }
-
-    requireHook.setListener(listener1);
-    require("./malformed.js");
-    requireHook.resetListener();
-
     requireHook.setListener(listener2);
     require("./no-exist.js");
+
   });
 
   it('throws the error if one is passed back from the listener', function () {
     requireHook.setListener(noop);
-    (function () { 
+    (function () {
       require("./no-exist.js");
     }).should.throw(/cannot find module/i);
   });
