@@ -10,6 +10,10 @@ var butt = require('butt');
 
 function noop () {}
 
+function escapeRegExp(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
 describe('replacing Module.prototype.require()', function() {
 
   it('attaches and detaches as expected', function() {
@@ -27,7 +31,10 @@ describe('replacing Module.prototype.require()', function() {
 
 });
 
-
+function checkCalculator (calc) {
+  return ["add", "subtract", "multiply", "divide"]
+    .every(calc.hasOwnProperty.bind(calc));
+}
 
 describe('intercepting require()', function () {
   var requireHook = require("..");
@@ -41,19 +48,33 @@ describe('intercepting require()', function () {
       called = true;
     }
     requireHook.setListener(listener);
-    require("./calculator");
+    var calc = require("./calculator.js");
+    (checkCalculator(calc)).should.equal(true);
     called.should.equal(true);
   });
 
   it('passes the result and some info to the listener', function () {
-    var calculator, result, info;
+    var calc, result, info;
     function listener (r, i) {
       result = r;
       info = i;
     }
     requireHook.setListener(listener);
-    calculator = require("./calculator");
-    calculator.should.equal(result);
+    calc = require("./calculator.js");
+    calc.should.equal(result);
+    (checkCalculator(calc)).should.equal(true);
+
+    var callingFileRe = new RegExp(escapeRegExp("intercept-require/test/index.js") + "$");
+    var absPathRe = new RegExp(escapeRegExp("intercept-require/test/calculator.js") + "$");
+
+    info.callingFile.match(callingFileRe).should.be.ok();
+    info.moduleId.should.equal("./calculator.js");
+    info.extname.should.equal(".js");
+    info.native.should.equal(false);
+    info.thirdParty.should.equal(false);
+    info.absPath.match(absPathRe).should.be.ok();
+    info.absPathResolvedCorrectly.should.equal(true);
+    info.localToProject.should.equal(true);
   });
 
   it('allows the listener to pass back a value', function () {
@@ -61,7 +82,7 @@ describe('intercepting require()', function () {
       return true;
     }
     requireHook.setListener(listener);
-    var calculator = require("./calculator");
+    var calculator = require("./calculator.js");
     calculator.should.equal(true);
   });
 
