@@ -22,16 +22,31 @@ function validateObj (target, validator) {
 
     if (validator[key] instanceof RegExp) {
       if (!validator[key].test(target[key])) {
-        throw new Error("Target object's " + key + "property didn't match RegExp");
+        var msg = [
+          "Target object's",
+          key,
+          "property didn't match RegExp",
+          "\n",
+          target[key]
+        ].join(" ");
+        throw new Error(msg);
       }
       return;
     }
 
     if (validator[key] !== target[key]) {
-      throw new Error("Expected properties at key " + key + "to be equal");
+      var msg = [
+        "Expected properties at key",
+        key,
+        "to be equal.",
+        "\n",
+        "Actual: ",
+        target[key],
+        "Expected: ",
+        validator[key]
+      ].join(" ");
+      throw new Error(msg);
     }
-
-
   });
 }
 
@@ -81,7 +96,7 @@ describe('intercepting require()', function () {
       info = i;
     }
     requireHook.setListener(listener);
-    calc = require("./calculator.js");
+    calc = require("./calculator");
     calc.should.equal(result);
     (checkCalculator(calc)).should.equal(true);
 
@@ -90,13 +105,14 @@ describe('intercepting require()', function () {
 
     validateObj(info, {
       callingFile: callingFileRe,
-      moduleId: "./calculator.js",
+      moduleId: "./calculator",
       extname: ".js",
       native: false,
       thirdParty: false,
       absPath: absPathRe,
       absPathResolvedCorrectly: true,
-      localToProject: true
+      testOnly: false,
+      local: true,
     });
   });
 
