@@ -37,7 +37,7 @@
   },
   "scripts": {
     "lint": "jshint",
-    "test": "mocha"
+    "test": "mocha ./test/index.js"
   },
   "main": "index.js"
 }
