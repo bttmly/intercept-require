@@ -1,8 +1,15 @@
 {
   "name": "intercept-require",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Intercept calls to require()",
-  "keywords": ["require", "hook", "override", "mock", "intercept", "modify"],
+  "keywords": [
+    "require",
+    "hook",
+    "override",
+    "mock",
+    "intercept",
+    "modify"
+  ],
   "homepage": "https://github.com/nickb1080/intercept-require",
   "contributors": [
     "Nick Bottomley (github.com/nickb1080)",
