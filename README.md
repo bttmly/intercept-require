@@ -1,8 +1,9 @@
-## forked from [https://bitbucket.org/ralphv/require-hook](https://bitbucket.org/ralphv/require-hook)
+#### forked from [https://bitbucket.org/ralphv/require-hook](https://bitbucket.org/ralphv/require-hook)
+---------------------------------------------------------------------------------------------------
 
-## require-hook - A node.js library that allows you to hook 'require', gather data about calls to 'require' and intercept/modify the results
+# require-hook [![Build Status](https://travis-ci.org/nickb1080/wassat.svg?branch=master)](https://travis-ci.org/nickb1080/wassat)
 
-### Will be changing the API substantially in this fork
+Docs coming shortly.
 
 ### License
-require-hook is licensed under the MIT License
+MIT
