@@ -1,7 +1,7 @@
 #### forked from [https://bitbucket.org/ralphv/require-hook](https://bitbucket.org/ralphv/require-hook)
 ---------------------------------------------------------------------------------------------------
 
-# require-hook [![Build Status](https://travis-ci.org/nickb1080/wassat.svg?branch=master)](https://travis-ci.org/nickb1080/wassat)
+# intercept-require [![Build Status](https://travis-ci.org/nickb1080/intercept-require.svg?branch=master)](https://travis-ci.org/nickb1080/intercept-require)
 
 Docs coming shortly.
 
