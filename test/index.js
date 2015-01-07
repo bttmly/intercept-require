@@ -69,7 +69,7 @@ describe('replacing Module.prototype.require()', function() {
     var intercept = require("..");
     intercept.attach();
     (function () {
-      require("path").should.be(ok);
+      require("path").should.be.ok();
     }).should.not.throw();
     intercept.detach();
   });
