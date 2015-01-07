@@ -54,17 +54,6 @@ describe('intercepting require()', function () {
     requireHook.setListener(listener);
     calculator = require("./calculator");
     calculator.should.equal(result);
-    info.should.eql({ 
-      require: './calculator',
-      callingFile: '/Users/nickbottomley/Documents/nb/require-hook/test/index.js',
-      native: false,
-      json: false,
-      absPath: '/Users/nickbottomley/Documents/nb/require-hook/test/calculator.js',
-      absPathResolvedCorrectly: true,
-      testOnly: true,
-      thirdParty: false,
-      localToProject: true 
-    });
   });
 
   it('allows the listener to pass back a value', function () {
