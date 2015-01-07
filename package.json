@@ -1,23 +1,16 @@
 {
-  "name": "require-hook",
-  "version": "0.1.2",
-  "description": "A node.js library that allows you to hook 'require', gather data about calls to 'require' and intercept/modify the results",
-  "keywords": [
-    "require",
-    "hook",
-    "override",
-    "mock",
-    "intercept",
-    "modify"
+  "name": "intercept-require",
+  "version": "0.1.0",
+  "description": "Intercept calls to require()",
+  "keywords": ["require", "hook", "override", "mock", "intercept", "modify"],
+  "homepage": "https://github.com/nickb1080/intercept-require",
+  "contributors": [
+    "Nick Bottomley (github.com/nickb1080)",
+    "ralph varjabedian"
   ],
-  "homepage": "https://bitbucket.org/ralphv/require-hook",
-  "author": "ralph varjabedian",
-  "directories": {
-    "lib": "./lib"
-  },
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/ralphv/require-hook.git"
+    "url": "https://github.com/nickb1080/intercept-require.git"
   },
   "license": "MIT",
   "dependencies": {
