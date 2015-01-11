@@ -165,4 +165,20 @@ describe('intercepting require()', function () {
     }).should.throw(/cannot find module/i);
   });
 
+  it('allows short circuiting', function () {
+    intercept.detach();
+    intercept.attach(null, {
+      shortCircuit: true
+    });
+
+    var result = {works: true};
+
+    intercept.setListener(function (_, info) {
+      return result;
+    });
+
+    require("./no-exist");
+  });
+
+
 });
