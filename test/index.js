@@ -173,11 +173,14 @@ describe('intercepting require()', function () {
 
     var result = {works: true};
 
-    intercept.setListener(function (_, info) {
+    intercept.setListener(function () {
       return result;
     });
 
-    require("./no-exist");
+    // if this doesn't throw, we know we didn't actually try to require it
+    var exported = require("./no-exist");
+
+    exported.should.equal(result);
   });
 
 
