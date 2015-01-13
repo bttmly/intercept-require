@@ -186,7 +186,6 @@ describe('intercepting require()', function () {
     intercept.attach(null, {
       shortCircuit: true,
       shortCircuitMatch: function (info) {
-        console.log(info.absPath, (/exist/).test(info.absPath));
         return (/exist/).test(info.absPath);
       }
     });
