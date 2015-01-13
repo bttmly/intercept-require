@@ -178,10 +178,10 @@ describe('intercepting require()', function () {
     exported.should.equal(result);
   });
 
-  it('allows short circuiting with mathing', function () {
+  it('allows short circuiting with matching', function () {
     intercept.detach();
 
-    var calc = require("./calculator");
+    var trueRequireResult = require("./calculator");
 
     intercept.attach(null, {
       shortCircuit: true,
@@ -190,20 +190,20 @@ describe('intercepting require()', function () {
       }
     });
 
-    var result = {works: true};
+    var shortCircuitResult = {works: true};
 
     intercept.setListener(function (original, info) {
-      if (!info.shortCircuitSucceeded) {
-        return original;
+      if (info.didShortCircuit) {
+        return shortCircuitResult;
       }
-      return result;
+      return trueRequireResult;
     });
 
-    var exported = require("./no-exist");
-    var reimportedCalc = require("./calculator");
+    var didShortCircuit = require("./no-exist");
+    var didntShortCircuit = require("./calculator");
 
-    exported.should.equal(result);
-    reimportedCalc.should.equal(calc);
+    didShortCircuit.should.equal(shortCircuitResult);
+    trueRequireResult.should.equal(didntShortCircuit);
   });
 
 });
