@@ -170,18 +170,41 @@ describe('intercepting require()', function () {
     intercept.attach(null, {
       shortCircuit: true
     });
-
     var result = {works: true};
-
     intercept.setListener(function () {
       return result;
     });
-
-    // if this doesn't throw, we know we didn't actually try to require it
     var exported = require("./no-exist");
-
     exported.should.equal(result);
   });
 
+  it('allows short circuiting with mathing', function () {
+    intercept.detach();
+
+    var calc = require("./calculator");
+
+    intercept.attach(null, {
+      shortCircuit: true,
+      shortCircuitMatch: function (info) {
+        console.log(info.absPath, (/exist/).test(info.absPath));
+        return (/exist/).test(info.absPath);
+      }
+    });
+
+    var result = {works: true};
+
+    intercept.setListener(function (original, info) {
+      if (!info.shortCircuitSucceeded) {
+        return original;
+      }
+      return result;
+    });
+
+    var exported = require("./no-exist");
+    var reimportedCalc = require("./calculator");
+
+    exported.should.equal(result);
+    reimportedCalc.should.equal(calc);
+  });
 
 });
