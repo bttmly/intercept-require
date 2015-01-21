@@ -1,12 +1,8 @@
-/**
- * Created by Ralph Varjabedian on 11/14/14.
- */
+"use strict";
 
-'use strict';
+var should = require("chai").should();
 
-var should = require('chai').should();
-
-var butt = require('butt');
+var butt = require("butt");
 
 function noop () {}
 
@@ -50,9 +46,9 @@ function validateObj (target, validator) {
   });
 }
 
-describe('replacing Module.prototype.require()', function() {
+describe("replacing Module.prototype.require()", function() {
 
-  it('attaches and detaches as expected', function() {
+  it("attaches and detaches as expected", function() {
     var intercept = require("../");
 
     var Module = require("module");
@@ -81,13 +77,13 @@ function checkCalculator (calc) {
     .every(calc.hasOwnProperty.bind(calc));
 }
 
-describe('intercepting require()', function () {
+describe("intercepting require()", function () {
   var intercept = require("..");
 
   beforeEach(butt(intercept.attach, 0));
   afterEach(butt(intercept.detach, 0));
 
-  it('invokes the listener when `require()` is invoked', function () {
+  it("invokes the listener when `require()` is invoked", function () {
     var called = false;
     function listener () {
       called = true;
@@ -98,7 +94,7 @@ describe('intercepting require()', function () {
     called.should.equal(true);
   });
 
-  it('passes the result and some info to the listener', function () {
+  it("passes the result and some info to the listener", function () {
     var calc, result, info;
     function listener (r, i) {
       result = r;
@@ -109,7 +105,7 @@ describe('intercepting require()', function () {
     calc.should.equal(result);
     (checkCalculator(calc)).should.equal(true);
 
-    var callingFileRe = new RegExp(escapeRegExp("intercept-require/test/index.js") + "$");
+    var callingFileRe = new RegExp(escapeRegExp("intercept-require/test/index-test.js") + "$");
     var absPathRe = new RegExp(escapeRegExp("intercept-require/test/calculator.js") + "$");
 
     validateObj(info, {
@@ -125,7 +121,7 @@ describe('intercepting require()', function () {
     });
   });
 
-  it('allows the listener to pass back a value', function () {
+  it("allows the listener to pass back a value", function () {
     function listener () {
       return true;
     }
@@ -134,7 +130,7 @@ describe('intercepting require()', function () {
     calculator.should.equal(true);
   });
 
-  it('passes an error in the result spot if one occurs', function () {
+  it("passes an error in the result spot if one occurs", function () {
 
     function listener1 (err, info) {
       (err instanceof Error).should.equal(true);
@@ -158,16 +154,16 @@ describe('intercepting require()', function () {
 
   });
 
-  it('throws the error if one is passed back from the listener', function () {
+  it("throws the error if one is passed back from the listener", function () {
     intercept.setListener(noop);
     (function () {
       require("./no-exist.js");
     }).should.throw(/cannot find module/i);
   });
 
-  it('allows short circuiting', function () {
+  it("allows short circuiting", function () {
     intercept.detach();
-    intercept.attach(null, {
+    intercept.attach({
       shortCircuit: true
     });
     var result = {works: true};
@@ -178,19 +174,19 @@ describe('intercepting require()', function () {
     exported.should.equal(result);
   });
 
-  it('allows short circuiting with matching', function () {
+  it("allows short circuiting with matching", function () {
     intercept.detach();
 
     var trueRequireResult = require("./calculator");
+    
+    var shortCircuitResult = {works: true};
 
-    intercept.attach(null, {
+    intercept.attach({
       shortCircuit: true,
       shortCircuitMatch: function (info) {
         return (/exist/).test(info.absPath);
       }
     });
-
-    var shortCircuitResult = {works: true};
 
     intercept.setListener(function (original, info) {
       if (info.didShortCircuit) {
