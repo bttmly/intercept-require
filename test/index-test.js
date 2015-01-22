@@ -5,7 +5,8 @@ var expect = require("chai").expect;
 
 var butt = require("butt");
 
-function noop () {}
+var CANNOT_FIND = /cannot find module/i;
+var UNEXPECTED_IDENTIFIER = /unexpected identifier/i;
 
 function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -50,11 +51,10 @@ function validateObj (target, validator) {
 describe("replacing Module.prototype.require()", function() {
 
   it("attaches and detaches as expected", function() {
-    var intercept = require("../");
-
     var Module = require("module");
     var oldRequire = Module.prototype.require;
 
+    var intercept = require("../");
     Module.prototype.require.should.equal(oldRequire);
     intercept.attach();
     Module.prototype.require.should.not.equal(oldRequire);
@@ -131,36 +131,44 @@ describe("intercepting require()", function () {
     calculator.should.equal(true);
   });
 
-  it("passes an error in the result spot if one occurs", function () {
+  it("passes an as `info.error` if one occurs, and result and `null`", function () {
+    var wasCalled1, wasCalled2;
 
     function listener1 (result, info) {
       expect(result).to.equal(null);
       expect(info.error).to.be.instanceof(Error);
-      /unexpected identifier/i.test(info.error.message).should.equal(true);
-      return true;
+      UNEXPECTED_IDENTIFIER.test(info.error.message).should.equal(true);
+      wasCalled1 = true;
     }
-
     intercept.setListener(listener1);
     require("./malformed.js");
+    wasCalled1.should.equal(true);
 
     intercept.resetListener();
-
     function listener2 (result, info) {
+      should.not.exist(null);
       expect(result).to.equal(null);
       expect(info.error).to.be.instanceof(Error);
-      /cannot find module/i.test(info.error.message).should.equal(true);
-      return true;
+      CANNOT_FIND.test(info.error.message).should.equal(true);
+      wasCalled2 = true;
     }
     intercept.setListener(listener2);
     require("./no-exist.js");
+    wasCalled2.should.equal(true);
 
   });
 
-  it("throws the error if one is passed back from the listener", function () {
-    // intercept.setListener(noop);
+  it("when no listener is attached, `require` should act normally", function () {
     (function () {
       require("./no-exist.js");
-    }).should.throw(/cannot find module/i);
+    }).should.throw(CANNOT_FIND);
+
+    (function () {
+      require("./malformed");
+    }).should.throw(UNEXPECTED_IDENTIFIER);
+
+    var calc = require("./calculator");
+    Object.keys(calc).sort().should.deep.equal(["add", "divide", "multiply", "subtract"]);
   });
 
   it("allows short circuiting", function () {
