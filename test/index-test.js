@@ -1,6 +1,7 @@
 "use strict";
 
 var should = require("chai").should();
+var expect = require("chai").expect;
 
 var butt = require("butt");
 
@@ -132,21 +133,22 @@ describe("intercepting require()", function () {
 
   it("passes an error in the result spot if one occurs", function () {
 
-    function listener1 (err, info) {
-      (err instanceof Error).should.equal(true);
-      should.exist(info);
-      /unexpected identifier/i.test(err.message).should.equal(true);
+    function listener1 (result, info) {
+      expect(result).to.equal(null);
+      expect(info.error).to.be.instanceof(Error);
+      /unexpected identifier/i.test(info.error.message).should.equal(true);
       return true;
     }
+
     intercept.setListener(listener1);
     require("./malformed.js");
 
     intercept.resetListener();
 
-    function listener2 (err, info) {
-      (err instanceof Error).should.equal(true);
-      should.exist(info);
-      /cannot find module/i.test(err.message).should.equal(true);
+    function listener2 (result, info) {
+      expect(result).to.equal(null);
+      expect(info.error).to.be.instanceof(Error);
+      /cannot find module/i.test(info.error.message).should.equal(true);
       return true;
     }
     intercept.setListener(listener2);
@@ -155,7 +157,7 @@ describe("intercepting require()", function () {
   });
 
   it("throws the error if one is passed back from the listener", function () {
-    intercept.setListener(noop);
+    // intercept.setListener(noop);
     (function () {
       require("./no-exist.js");
     }).should.throw(/cannot find module/i);
