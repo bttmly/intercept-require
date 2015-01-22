@@ -53,7 +53,7 @@ describe("replacing Module.prototype.require()", function() {
     var Module = require("module");
     var oldRequire = Module.prototype.require;
 
-    var intercept = require("../");
+    var intercept = require("../lib/index");
     Module.prototype.require.should.equal(oldRequire);
     intercept.attach();
     Module.prototype.require.should.not.equal(oldRequire);
@@ -62,7 +62,7 @@ describe("replacing Module.prototype.require()", function() {
   });
 
   it("doesn't fail if intercepting is active but no listener", function () {
-    var intercept = require("..");
+    var intercept = require("../lib/index");
     intercept.attach();
     (function () {
       require("path").should.be.ok();
@@ -78,7 +78,7 @@ function checkCalculator (calc) {
 }
 
 describe("intercepting require()", function () {
-  var intercept = require("..");
+  var intercept = require("../lib/index");
 
   beforeEach(butt(intercept.attach, 0));
   afterEach(butt(intercept.detach, 0));
@@ -168,6 +168,10 @@ describe("intercepting require()", function () {
 
     var calc = require("./calculator");
     Object.keys(calc).sort().should.deep.equal(["add", "divide", "multiply", "subtract"]);
+  });
+
+  it("setListener throws when passed anything but a function", function () {
+    intercept.setListener.bind(intercept).should.throw(/`listener` must be a function/);
   });
 
   it("allows short circuiting", function () {
