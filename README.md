@@ -21,7 +21,7 @@ Short-circuiting allows a consumer to skip disk I/O entirely. In normal situaton
 #### `.detach()`
 Restore `Module.prototype.require` to it's original value. This also resets the `listener`, so that if `.attach()` is later called, no listener will initially be set.
 
-#### `.setListener(Function listener<Object info, Object result>)`
+#### `.setListener(Function<Object info, Object result> listener)`
 Set the listener that will be invoked on every `require()` call. The listener is passed two arguments: an `info` object that represents some metadata about the `require()` call and the module that was found, and an `result` object which contains the `module.exports` of whatever module would have been found had `require()` been called normally. When short-circuiting is active, `result` will be null.
 
 The return value of `setListener()` is passed to the requiring module as the return value of `require()` **unless an error is returned, in which case it will be thrown**.
@@ -30,7 +30,7 @@ The return value of `setListener()` is passed to the requiring module as the ret
 Discard the current `listener`. Until another listener is set, all `require()` calls will behave as normal.
 
 #### `.originalRequire`
-A reference to the original function found at `Module.prototype.require`.
+A reference to the original function found at `Module.prototype.require`. It's technically possible that this isn't the built in function if something else has overwritten it before `intercept-require` is run.
 
 
 ## Example
