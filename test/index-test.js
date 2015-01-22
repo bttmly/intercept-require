@@ -1,7 +1,6 @@
 "use strict";
 
 var should = require("chai").should();
-var expect = require("chai").expect;
 
 var butt = require("butt");
 
@@ -135,8 +134,8 @@ describe("intercepting require()", function () {
     var wasCalled1, wasCalled2;
 
     function listener1 (result, info) {
-      expect(result).to.equal(null);
-      expect(info.error).to.be.instanceof(Error);
+      should.not.exist(result);
+      info.error.should.be.instanceof(Error);
       UNEXPECTED_IDENTIFIER.test(info.error.message).should.equal(true);
       wasCalled1 = true;
     }
@@ -145,10 +144,10 @@ describe("intercepting require()", function () {
     wasCalled1.should.equal(true);
 
     intercept.resetListener();
+
     function listener2 (result, info) {
-      should.not.exist(null);
-      expect(result).to.equal(null);
-      expect(info.error).to.be.instanceof(Error);
+      should.not.exist(result);
+      info.error.should.be.instanceof(Error);
       CANNOT_FIND.test(info.error.message).should.equal(true);
       wasCalled2 = true;
     }
