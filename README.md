@@ -22,9 +22,11 @@ Short-circuiting allows a consumer to skip disk I/O entirely. In normal situaton
 Restore `Module.prototype.require` to it's original value. This also resets the `listener`, so that if `.attach()` is later called, no listener will initially be set.
 
 #### `.setListener(Function<Object info, Object result> listener)`
-Set the listener that will be invoked on every `require()` call. The listener is passed two arguments: an `info` object that represents some metadata about the `require()` call and the module that was found, and an `result` object which contains the `module.exports` of whatever module would have been found had `require()` been called normally. When short-circuiting is active, `result` will be null.
+Set the listener that will be invoked on every `require()` call. The listener is passed two arguments: an `info` object that represents some metadata about the `require()` call and the module that was found, and an `result` object which contains the `module.exports` of whatever module would have been found had `require()` been called normally, **unless** the `require()` call throws, in which case `result` will be `undefined` and `info.error` will contain the caught error.
 
-The return value of `setListener()` is passed to the requiring module as the return value of `require()` **unless an error is returned, in which case it will be thrown**.
+When short-circuiting is active, `result` will be null.
+
+The return value of `setListener()` is passed to the requiring module as the return value of `require()` **unless an error is returned, in which case it will be thrown**. If you want to handle (and possibly recover from) errors, then 
 
 #### `.resetListener()`
 Discard the current `listener`. Until another listener is set, all `require()` calls will behave as normal.
