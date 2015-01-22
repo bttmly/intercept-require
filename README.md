@@ -68,5 +68,22 @@ require("lodash");
 //  }
 ```
 
+### Info
+`info` objects adhere to this schema
+```
+{
+  exports: Any,
+  moduleId: String,
+  callingFile: String,
+  extname: String,
+  absPath: String,
+  core: Boolean, 
+  thirdParty: Boolean,
+  local: Boolean,
+  absPathResolvedCorrectly: Boolean,
+  testOnly: Boolean
+}
+```
+
 ### License
 MIT
