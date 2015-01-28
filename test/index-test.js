@@ -191,8 +191,11 @@ describe("intercepting require()", function () {
     intercept.detach();
 
     var trueRequireResult = require("./calculator");
-    
+
     var shortCircuitResult = {works: true};
+
+    var timesShortCircuitedSucceeded = 0;
+    var timesShortCircuitSkipped = 0;
 
     intercept.attach({
       shortCircuit: true,
@@ -203,8 +206,10 @@ describe("intercepting require()", function () {
 
     intercept.setListener(function (original, info) {
       if (info.didShortCircuit) {
+        timesShortCircuitedSucceeded++;
         return shortCircuitResult;
       }
+      timesShortCircuitSkipped++;
       return trueRequireResult;
     });
 
@@ -213,6 +218,8 @@ describe("intercepting require()", function () {
 
     didShortCircuit.should.equal(shortCircuitResult);
     trueRequireResult.should.equal(didntShortCircuit);
+    timesShortCircuitSkipped.should.equal(1);
+    timesShortCircuitedSucceeded.should.equal(1);
   });
 
 });
