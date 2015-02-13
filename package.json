@@ -29,6 +29,7 @@
   "devDependencies": {
     "butt": "^2.0.0",
     "chai": "^1.10.0",
+    "codecov.io": "0.0.8",
     "grunt": "^0.4.5",
     "istanbul": "^0.3.5",
     "jshint": "^2.5.11",
