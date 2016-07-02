@@ -1,5 +1,6 @@
 "use strict";
 
+var assert = require("assert");
 var should = require("chai").should();
 
 var butt = require("butt");
@@ -47,179 +48,176 @@ function validateObj (target, validator) {
   });
 }
 
-describe("replacing Module.prototype.require()", function() {
+var Module = require("module");
+var __require = Module.prototype.require;
 
-  it("attaches and detaches as expected", function() {
-    var Module = require("module");
-    var oldRequire = Module.prototype.require;
+var intercept = require("../lib/index");
 
-    var intercept = require("../lib/index");
-    Module.prototype.require.should.equal(oldRequire);
-    intercept.attach();
-    Module.prototype.require.should.not.equal(oldRequire);
-    intercept.detach();
-    Module.prototype.require.should.equal(oldRequire);
+describe("intercept-require", function () {
+
+  // ensure we're back in a sane state after each test;
+  afterEach(function () {
+    assert(Module.prototype.require === __require, "Failed to call restore()")
   });
 
-  it("doesn't fail if intercepting is active but no listener", function () {
-    var intercept = require("../lib/index");
-    intercept.attach();
-    (function () {
-      require("path").should.be.ok();
-    }).should.not.throw();
-    intercept.detach();
-  });
+  describe("replacing Module.prototype.require()", function() {
 
-});
-
-function checkCalculator (calc) {
-  return ["add", "subtract", "multiply", "divide"]
-    .every(calc.hasOwnProperty.bind(calc));
-}
-
-describe("intercepting require()", function () {
-  var intercept = require("../lib/index");
-
-  beforeEach(butt(intercept.attach, 0));
-  afterEach(butt(intercept.detach, 0));
-
-  it("invokes the listener when `require()` is invoked", function () {
-    var called = false;
-    function listener () {
-      called = true;
-    }
-    intercept.setListener(listener);
-    var calc = require("./calculator.js");
-    (checkCalculator(calc)).should.equal(true);
-    called.should.equal(true);
-  });
-
-  it("passes the result and some info to the listener", function () {
-    var calc, result, info;
-    function listener (r, i) {
-      result = r;
-      info = i;
-    }
-    intercept.setListener(listener);
-    calc = require("./calculator");
-    calc.should.equal(result);
-    (checkCalculator(calc)).should.equal(true);
-
-    var callingFileRe = new RegExp(escapeRegExp("intercept-require/test/index-test.js") + "$");
-    var absPathRe = new RegExp(escapeRegExp("intercept-require/test/calculator.js") + "$");
-
-    validateObj(info, {
-      callingFile: callingFileRe,
-      moduleId: "./calculator",
-      extname: ".js",
-      native: false,
-      thirdParty: false,
-      absPath: absPathRe,
-      absPathResolvedCorrectly: true,
-      testOnly: false,
-      local: true,
+    it("attaches and detaches as expected", function() {
+      const Module = require("module");
+      const oldRequire = Module.prototype.require;
+      const restore = intercept(() => {});
+      Module.prototype.require.should.not.equal(oldRequire);
+      restore()
+      Module.prototype.require.should.equal(oldRequire);
     });
   });
 
-  it("allows the listener to pass back a value", function () {
-    function listener () {
-      return true;
-    }
-    intercept.setListener(listener);
-    var calculator = require("./calculator.js");
-    calculator.should.equal(true);
-  });
+  function checkCalculator (calc) {
+    return ["add", "subtract", "multiply", "divide"]
+      .every(calc.hasOwnProperty.bind(calc));
+  }
 
-  it("passes an as `info.error` if one occurs, and result and `null`", function () {
-    var wasCalled1, wasCalled2;
+  describe("intercepting require()", function () {
+    var intercept = require("../lib/index");
 
-    function listener1 (result, info) {
-      should.not.exist(result);
-      info.error.should.be.instanceof(Error);
-      UNEXPECTED_IDENTIFIER.test(info.error.message).should.equal(true);
-      wasCalled1 = true;
-    }
-    intercept.setListener(listener1);
-    require("./malformed.js");
-    wasCalled1.should.equal(true);
+    it("invokes the listener when `require()` is invoked", function () {
+      let called = false;
+      const restore = intercept(() => {
+        called = true
+      });
+      const calc = require("./calculator.js");
+      (checkCalculator(calc)).should.equal(true);
+      called.should.equal(true);
+      restore();
+    });
 
-    intercept.resetListener();
+    it("passes the result and some info to the listener", function () {
+      var calc, result, info;
+      function listener (r, i) {
+        result = r;
+        info = i;
+      }
+      const restore = intercept(listener);
+      calc = require("./calculator");
+      calc.should.equal(result);
+      (checkCalculator(calc)).should.equal(true);
 
-    function listener2 (result, info) {
-      should.not.exist(result);
-      info.error.should.be.instanceof(Error);
-      CANNOT_FIND.test(info.error.message).should.equal(true);
-      wasCalled2 = true;
-    }
-    intercept.setListener(listener2);
-    require("./no-exist.js");
-    wasCalled2.should.equal(true);
+      var callingFileRe = new RegExp(escapeRegExp("intercept-require/test/index-test.js") + "$");
+      var absPathRe = new RegExp(escapeRegExp("intercept-require/test/calculator.js") + "$");
 
-  });
+      validateObj(info, {
+        callingFile: callingFileRe,
+        moduleId: "./calculator",
+        extname: ".js",
+        native: false,
+        thirdParty: false,
+        absPath: absPathRe,
+        absPathResolvedCorrectly: true,
+        local: true,
+      });
 
-  it("when no listener is attached, `require` should act normally", function () {
-    (function () {
+      restore();
+    });
+
+    it("allows the listener to pass back a value", function () {
+      var restore = intercept(function () { return true; });
+      var calculator = require("./calculator.js");
+      calculator.should.equal(true);
+      restore();
+    });
+
+    it("passes an as `info.error` if one occurs, and result and `null`", function () {
+      var wasCalled1, wasCalled2, restore;
+
+      function listener1 (result, info) {
+        should.not.exist(result);
+        info.error.should.be.instanceof(Error);
+        UNEXPECTED_IDENTIFIER.test(info.error.message).should.equal(true);
+        wasCalled1 = true;
+      }
+
+      restore = intercept(listener1)
+      require("./malformed.js");
+      wasCalled1.should.equal(true);
+
+      restore();
+
+      function listener2 (result, info) {
+        should.not.exist(result);
+        info.error.should.be.instanceof(Error);
+        CANNOT_FIND.test(info.error.message).should.equal(true);
+        wasCalled2 = true;
+      }
+      restore = intercept(listener2);
       require("./no-exist.js");
-    }).should.throw(CANNOT_FIND);
+      wasCalled2.should.equal(true);
 
-    (function () {
-      require("./malformed");
-    }).should.throw(UNEXPECTED_IDENTIFIER);
-
-    var calc = require("./calculator");
-    Object.keys(calc).sort().should.deep.equal(["add", "divide", "multiply", "subtract"]);
-  });
-
-  it("setListener throws when passed anything but a function", function () {
-    intercept.setListener.bind(intercept).should.throw(/`listener` must be a function/);
-  });
-
-  it("allows short circuiting", function () {
-    intercept.detach();
-    intercept.attach({
-      shortCircuit: true
-    });
-    var result = {works: true};
-    intercept.setListener(function () {
-      return result;
-    });
-    var exported = require("./no-exist");
-    exported.should.equal(result);
-  });
-
-  it("allows short circuiting with matching", function () {
-    intercept.detach();
-
-    var trueRequireResult = require("./calculator");
-
-    var shortCircuitResult = {works: true};
-
-    var timesShortCircuitedSucceeded = 0;
-    var timesShortCircuitSkipped = 0;
-
-    intercept.attach({
-      shortCircuit: true,
-      shortCircuitMatch: function (info) {
-        return (/exist/).test(info.absPath);
-      }
+      restore();
     });
 
-    intercept.setListener(function (original, info) {
-      if (info.didShortCircuit) {
-        timesShortCircuitedSucceeded++;
-        return shortCircuitResult;
-      }
-      timesShortCircuitSkipped++;
-      return trueRequireResult;
+    it("when no listener is attached, `require` should act normally", function () {
+      (function () {
+        require("./no-exist.js");
+      }).should.throw(CANNOT_FIND);
+
+      (function () {
+        require("./malformed");
+      }).should.throw(UNEXPECTED_IDENTIFIER);
+
+      var calc = require("./calculator");
+      Object.keys(calc).sort().should.deep.equal(["add", "divide", "multiply", "subtract"]);
     });
 
-    var didShortCircuit = require("./no-exist");
-    var didntShortCircuit = require("./calculator");
+    it("setListener throws when passed anything but a function", function () {
+      (function () {
+        intercept()
+      }).should.throw(/argument must be a function/)
+    });
 
-    didShortCircuit.should.equal(shortCircuitResult);
-    trueRequireResult.should.equal(didntShortCircuit);
-    timesShortCircuitSkipped.should.equal(1);
-    timesShortCircuitedSucceeded.should.equal(1);
+    it("allows short circuiting", function () {
+      const restore = intercept(function () {
+        return result;
+      }, {
+        shortCircuit: true
+      });
+      var result = {works: true};
+      var exported = require("./no-exist");
+      exported.should.equal(result);
+      restore();
+    });
+
+    it("allows short circuiting with matching", function () {
+      var trueRequireResult = require("./calculator");
+
+      var shortCircuitResult = {works: true};
+
+      var timesShortCircuitedSucceeded = 0;
+      var timesShortCircuitSkipped = 0;
+
+      const restore = intercept(function (original, info) {
+        if (info.didShortCircuit) {
+          timesShortCircuitedSucceeded++;
+          return shortCircuitResult;
+        }
+        timesShortCircuitSkipped++;
+        return trueRequireResult;
+      }, {
+        shortCircuit: true,
+        shortCircuitMatch: function (info) {
+          return (/exist/).test(info.absPath);
+        }
+      });
+
+      var didShortCircuit = require("./no-exist");
+      var didntShortCircuit = require("./calculator");
+
+      didShortCircuit.should.equal(shortCircuitResult);
+      trueRequireResult.should.equal(didntShortCircuit);
+      timesShortCircuitSkipped.should.equal(1);
+      timesShortCircuitedSucceeded.should.equal(1);
+
+      restore();
+    });
+
   });
-
 });
