@@ -1,12 +1,15 @@
 "use strict";
 
-var assert = require("assert");
-var should = require("chai").should();
+const assert = require("assert");
+const Module = require("module");
+const __require = Module.prototype.require;
 
-var butt = require("butt");
+const expect = require("expect");
 
-var CANNOT_FIND = /cannot find module/i;
-var UNEXPECTED_IDENTIFIER = /unexpected identifier/i;
+const intercept = require("../lib/index");
+
+const CANNOT_FIND = /cannot find module/i;
+const UNEXPECTED_IDENTIFIER = /unexpected identifier/i;
 
 function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -20,7 +23,7 @@ function validateObj (target, validator) {
 
     if (validator[key] instanceof RegExp) {
       if (!validator[key].test(target[key])) {
-        var msg = [
+        const msg = [
           "Target object's",
           key,
           "property didn't match RegExp",
@@ -33,7 +36,7 @@ function validateObj (target, validator) {
     }
 
     if (validator[key] !== target[key]) {
-      var msg = [
+      const msg = [
         "Expected properties at key",
         key,
         "to be equal.",
@@ -48,11 +51,6 @@ function validateObj (target, validator) {
   });
 }
 
-var Module = require("module");
-var __require = Module.prototype.require;
-
-var intercept = require("../lib/index");
-
 describe("intercept-require", function () {
 
   // ensure we're back in a sane state after each test;
@@ -63,12 +61,11 @@ describe("intercept-require", function () {
   describe("replacing Module.prototype.require()", function() {
 
     it("attaches and detaches as expected", function() {
-      const Module = require("module");
       const oldRequire = Module.prototype.require;
       const restore = intercept(() => {});
-      Module.prototype.require.should.not.equal(oldRequire);
+      expect(Module.prototype.require).toNotEqual(oldRequire);
       restore()
-      Module.prototype.require.should.equal(oldRequire);
+      expect(Module.prototype.require).toEqual(oldRequire);
     });
   });
 
@@ -78,7 +75,7 @@ describe("intercept-require", function () {
   }
 
   describe("intercepting require()", function () {
-    var intercept = require("../lib/index");
+    const intercept = require("../lib/index");
 
     it("invokes the listener when `require()` is invoked", function () {
       let called = false;
@@ -86,24 +83,25 @@ describe("intercept-require", function () {
         called = true
       });
       const calc = require("./calculator.js");
-      (checkCalculator(calc)).should.equal(true);
-      called.should.equal(true);
+      expect(checkCalculator(calc)).toEqual(true);
+      expect(called).toEqual(true);
       restore();
     });
 
     it("passes the result and some info to the listener", function () {
-      var calc, result, info;
+      let calc, result, info;
       function listener (r, i) {
         result = r;
         info = i;
       }
+
       const restore = intercept(listener);
       calc = require("./calculator");
-      calc.should.equal(result);
-      (checkCalculator(calc)).should.equal(true);
+      expect(calc).toEqual(result);
+      expect(checkCalculator(calc)).toEqual(true);
 
-      var callingFileRe = new RegExp(escapeRegExp("intercept-require/test/index-test.js") + "$");
-      var absPathRe = new RegExp(escapeRegExp("intercept-require/test/calculator.js") + "$");
+      const callingFileRe = new RegExp(escapeRegExp("intercept-require/test/test.js") + "$");
+      const absPathRe = new RegExp(escapeRegExp("intercept-require/test/calculator.js") + "$");
 
       validateObj(info, {
         callingFile: callingFileRe,
@@ -120,58 +118,58 @@ describe("intercept-require", function () {
     });
 
     it("allows the listener to pass back a value", function () {
-      var restore = intercept(function () { return true; });
-      var calculator = require("./calculator.js");
-      calculator.should.equal(true);
+      const restore = intercept(function () { return true; });
+      const calculator = require("./calculator.js");
+      expect(calculator).toEqual(true);
       restore();
     });
 
     it("passes an as `info.error` if one occurs, and result and `null`", function () {
-      var wasCalled1, wasCalled2, restore;
+      let wasCalled1, wasCalled2, restore;
 
       function listener1 (result, info) {
-        should.not.exist(result);
-        info.error.should.be.instanceof(Error);
-        UNEXPECTED_IDENTIFIER.test(info.error.message).should.equal(true);
+        expect(result).toNotExist();
+        expect(info.error).toBeA(Error);
+        expect(UNEXPECTED_IDENTIFIER.test(info.error.message)).toEqual(true);
         wasCalled1 = true;
       }
 
       restore = intercept(listener1)
       require("./malformed.js");
-      wasCalled1.should.equal(true);
+      expect(wasCalled1).toBe(true);
 
       restore();
 
       function listener2 (result, info) {
-        should.not.exist(result);
-        info.error.should.be.instanceof(Error);
-        CANNOT_FIND.test(info.error.message).should.equal(true);
+        expect(result).toNotExist();
+        expect(info.error).toBeA(Error);
+        expect(CANNOT_FIND.test(info.error.message)).toBe(true);
         wasCalled2 = true;
       }
       restore = intercept(listener2);
       require("./no-exist.js");
-      wasCalled2.should.equal(true);
+      expect(wasCalled2).toBe(true);
 
       restore();
     });
 
     it("when no listener is attached, `require` should act normally", function () {
-      (function () {
+      expect(function () {
         require("./no-exist.js");
-      }).should.throw(CANNOT_FIND);
+      }).toThrow(CANNOT_FIND);
 
-      (function () {
+      expect(function () {
         require("./malformed");
-      }).should.throw(UNEXPECTED_IDENTIFIER);
+      }).toThrow(UNEXPECTED_IDENTIFIER);
 
-      var calc = require("./calculator");
-      Object.keys(calc).sort().should.deep.equal(["add", "divide", "multiply", "subtract"]);
+      const calc = require("./calculator");
+      expect(Object.keys(calc).sort()).toEqual(["add", "divide", "multiply", "subtract"]);
     });
 
     it("setListener throws when passed anything but a function", function () {
-      (function () {
+      expect(function () {
         intercept()
-      }).should.throw(/argument must be a function/)
+      }).toThrow(/argument must be a function/)
     });
 
     it("allows short circuiting", function () {
@@ -180,19 +178,19 @@ describe("intercept-require", function () {
       }, {
         shortCircuit: true
       });
-      var result = {works: true};
-      var exported = require("./no-exist");
-      exported.should.equal(result);
+      const result = {works: true};
+      const exported = require("./no-exist");
+      expect(exported).toBe(result);
       restore();
     });
 
     it("allows short circuiting with matching", function () {
-      var trueRequireResult = require("./calculator");
+      const trueRequireResult = require("./calculator");
 
-      var shortCircuitResult = {works: true};
+      const shortCircuitResult = {works: true};
 
-      var timesShortCircuitedSucceeded = 0;
-      var timesShortCircuitSkipped = 0;
+      let timesShortCircuitedSucceeded = 0;
+      let timesShortCircuitSkipped = 0;
 
       const restore = intercept(function (original, info) {
         if (info.didShortCircuit) {
@@ -208,13 +206,13 @@ describe("intercept-require", function () {
         }
       });
 
-      var didShortCircuit = require("./no-exist");
-      var didntShortCircuit = require("./calculator");
+      const didShortCircuit = require("./no-exist");
+      const didntShortCircuit = require("./calculator");
 
-      didShortCircuit.should.equal(shortCircuitResult);
-      trueRequireResult.should.equal(didntShortCircuit);
-      timesShortCircuitSkipped.should.equal(1);
-      timesShortCircuitedSucceeded.should.equal(1);
+      expect(didShortCircuit).toBe(shortCircuitResult);
+      expect(trueRequireResult).toBe(didntShortCircuit);
+      expect(timesShortCircuitSkipped).toBe(1);
+      expect(timesShortCircuitedSucceeded).toBe(1);
 
       restore();
     });

@@ -22,23 +22,17 @@
   "license": "MIT",
   "dependencies": {
     "callsite": "^1.0.0",
-    "lodash.find": "^2.4.1",
-    "lodash.intersection": "^2.4.1",
     "object-assign": "^2.0.0"
   },
   "devDependencies": {
-    "butt": "^2.0.0",
-    "chai": "^1.10.0",
     "codecov.io": "0.0.8",
-    "grunt": "^0.4.5",
+    "expect": "^1.20.2",
     "istanbul": "^0.3.5",
     "jshint": "^2.5.11",
-    "mocha": "^2.1.0",
-    "should": "*"
+    "mocha": "^2.1.0"
   },
   "scripts": {
-    "lint": "jshint",
-    "test": "mocha ./test/index-test.js",
+    "test": "mocha ./test/test.js",
     "cover": "node --harmony ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- ./test/index-test.js -R spec",
     "codecovio": "npm run cover; cat ./coverage/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js --verbose"
   },
