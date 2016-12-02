@@ -12,6 +12,8 @@ Intercept, prevent, modify, and short-circuit calls to `require()`.
 const intercept = require("intercept-require");
 // in this example, just transparently log every require
 const restore = intercept(function (moduleExport, info) {
+  // moduleExport is whatever the actual module exported
+
   // info looks like:
   //  {
   //    moduleId: "lodash",
@@ -26,6 +28,8 @@ const restore = intercept(function (moduleExport, info) {
   //    local: false
   //  }
   console.log("require:", info.moduleId, "from", info.callingFile);
+  
+  // value returned from this function will be passed back to the caller as if it was module.exports
   return moduleExport;
 }, config);
 // config has only one option `shortCircuit: boolean`
