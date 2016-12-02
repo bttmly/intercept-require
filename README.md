@@ -1,7 +1,4 @@
-#### forked from [https://bitbucket.org/ralphv/require-hook](https://bitbucket.org/ralphv/require-hook)
----------------------------------------------------------------------------------------------------
-
-# intercept-require [![Build Status](https://travis-ci.org/nickb1080/intercept-require.svg?branch=master)](https://travis-ci.org/nickb1080/intercept-require) [![codecov.io](https://codecov.io/github/nickb1080/intercept-require/coverage.svg?branch=master)](https://codecov.io/github/nickb1080/intercept-require?branch=master)
+# intercept-require [![Build Status](https://travis-ci.org/nickb1080/intercept-require.svg?branch=master)](https://travis-ci.org/nickb1080/intercept-require)
 
 ## Installation
 
