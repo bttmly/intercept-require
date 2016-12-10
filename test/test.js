@@ -88,6 +88,14 @@ describe("intercept-require", function () {
       restore();
     });
 
+    it("should not throw on native modules", function () {
+      const restore = intercept(() => {});
+      expect(function() {
+        require('fs');
+      }).toNotThrow();
+      restore();
+    });
+
     it("passes the result and some info to the listener", function () {
       let calc, result, info;
       function listener (r, i) {
