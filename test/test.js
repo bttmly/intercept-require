@@ -1,5 +1,6 @@
 "use strict";
 
+const path = require("path");
 const assert = require("assert");
 const Module = require("module");
 const __require = Module.prototype.require;
@@ -100,16 +101,16 @@ describe("intercept-require", function () {
       expect(calc).toEqual(result);
       expect(checkCalculator(calc)).toEqual(true);
 
-      const callingFileRe = new RegExp(escapeRegExp("intercept-require/test/test.js") + "$");
-      const absPathRe = new RegExp(escapeRegExp("intercept-require/test/calculator.js") + "$");
+      const absPath = path.join(__dirname, "../test/calculator.js");
+      const callingFile = path.join(__dirname, "../test/test.js");
 
       validateObj(info, {
-        callingFile: callingFileRe,
+        callingFile: callingFile,
         moduleId: "./calculator",
         extname: ".js",
         native: false,
         thirdParty: false,
-        absPath: absPathRe,
+        absPath: absPath,
         absPathResolvedCorrectly: true,
         local: true,
       });
@@ -214,6 +215,14 @@ describe("intercept-require", function () {
       expect(timesShortCircuitSkipped).toBe(1);
       expect(timesShortCircuitedSucceeded).toBe(1);
 
+      restore();
+    });
+
+    it("should not throw on native modules", function () {
+      const restore = intercept(() => {});
+      expect(function() {
+        require("fs");
+      }).toNotThrow();
       restore();
     });
 
