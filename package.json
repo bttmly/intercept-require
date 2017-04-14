@@ -10,14 +10,14 @@
     "intercept",
     "modify"
   ],
-  "homepage": "https://github.com/nickb1080/intercept-require",
+  "homepage": "https://github.com/bttmly/intercept-require",
   "contributors": [
-    "Nick Bottomley (github.com/nickb1080)",
+    "Nick Bottomley (github.com/bttmly)",
     "ralph varjabedian"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/nickb1080/intercept-require.git"
+    "url": "https://github.com/bttmly/intercept-require.git"
   },
   "license": "MIT",
   "dependencies": {
